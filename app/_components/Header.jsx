@@ -43,8 +43,6 @@ function Header() {
         <Link href='/SignUp'>
        <Button>Get started</Button>
        </Link>
-
-       
      </div>
   )
 }

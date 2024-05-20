@@ -1,17 +1,24 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';  // Update import path
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';  // Ensure the correct import path
 import { Button } from '@/components/ui/button';
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
-
-function SignIn() {
+function SignIn({ initialUserId }) {
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   });
   const [error, setError] = useState('');
   const router = useRouter();
+  const [userId, setUserId] = useState(initialUserId);
+
+  useEffect(() => {
+    if (userId) {
+      router.push('/');  // Redirect if user is already logged in
+    }
+  }, [userId, router]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,8 +29,16 @@ function SignIn() {
     try {
       const response = await axios.post('http://localhost:8080/user/login', formData);
       console.log(response.data);
-      // Redirect to dashboard or user profile page upon successful sign-in
-      router.push('/dashboard');
+
+      // Set cookies upon successful sign-in
+      Cookies.set('UserId', response.data.idU);
+      Cookies.set('UserFN', response.data.firstName);
+      Cookies.set('UserLN', response.data.lastName);
+      Cookies.set('UserEm', response.data.email);
+      Cookies.set('UserIM', response.data.imgPath);
+
+      setUserId(response.data.idU);  // Update state to reflect the user is logged in
+      router.push('/');
     } catch (error) {
       console.error('Error signing in:', error);
       setError('Invalid username or password. Please try again.');
@@ -68,6 +83,9 @@ function SignIn() {
                   </p>
                 </div>
               </form>
+              {userId && (
+                <Button onClick={() => router.push('/Logout')}>Logout</Button>
+              )}
             </div>
           </main>
           <section className="relative flex h-32 items-end bg-gray-900 lg:col-span-5 lg:h-full xl:col-span-6">
@@ -78,7 +96,7 @@ function SignIn() {
             />
             <div className="hidden lg:relative lg:block lg:p-12">
               <h2 className="mt-6 text-2xl font-bold text-white sm:text-3xl md:text-4xl">Sign in</h2>
-              <p className="mt-4 leading-relaxed text-white/90">get in here and experience better healthcare services with us</p>
+              <p className="mt-4 leading-relaxed text-white/90">Get in here and experience better healthcare services with us</p>
             </div>
           </section>
         </div>
