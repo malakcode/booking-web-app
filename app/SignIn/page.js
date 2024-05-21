@@ -16,7 +16,7 @@ function SignIn({ initialUserId }) {
 
   useEffect(() => {
     if (userId) {
-      router.push('/');  // Redirect if user is already logged in
+      router.push('/userspace/');  // Redirect if user is already logged in
     }
   }, [userId, router]);
 
@@ -38,7 +38,7 @@ function SignIn({ initialUserId }) {
       Cookies.set('UserIM', response.data.imgPath);
 
       setUserId(response.data.idU);  // Update state to reflect the user is logged in
-      router.push('/');
+      router.push('/userspace/');
     } catch (error) {
       console.error('Error signing in:', error);
       setError('Invalid username or password. Please try again.');
